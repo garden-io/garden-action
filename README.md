@@ -2,6 +2,9 @@
 
 This action can be used to run Garden against a given environment.
 
+**Note:** At the moment this action only works with Linux-based GitHub Action runners.
+If you are using macOS or Windows runners and need this action, please open a GitHub issue – in case there is demand, we will rewrite this action to make it platform-independent. (We also accept Pull requests for rewriting this Action in Typescript)
+
 ## Inputs
 
 ## `command`

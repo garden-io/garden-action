@@ -104,7 +104,7 @@ runs:
         ln -sfn "$garden_version" bin
 
         echo "Using garden version $(bin/garden --version)"
-        echo "${HOME}/.garden/bin" >> $GITHUB_PATH
+        echo "${HOME}/.garden/bin" >> "$GITHUB_PATH"
     - name: run garden
       if: inputs.command
       shell: bash
@@ -126,8 +126,8 @@ runs:
       run: |
         # Export environment variables
         if [[ "${kubeconfig_base64}" != "" ]]; then
-          echo "KUBECONFIG=${kubeconfig_location}" >> $GITHUB_ENV
+          echo "KUBECONFIG=${kubeconfig_location}" >> "$GITHUB_ENV"
         fi
         if [[ "${garden_auth_token}" != "" ]]; then
-          echo "GARDEN_AUTH_TOKEN=${garden_auth_token} >> $GITHUB_ENV"
+          echo "GARDEN_AUTH_TOKEN=${garden_auth_token}" >> "$GITHUB_ENV"
         fi
