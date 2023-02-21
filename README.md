@@ -53,7 +53,7 @@ Only necessary if there are multiple garden projects in a repository or if the `
 
 ## `github-token`
 
-**Optional** This token will be used to authenticate to GitHub API for fetching the latest Garden release. The default is ${{ github.token }}.
+**Optional** This token will be used to authenticate to GitHub API for fetching the latest Garden release. Defaults to `${{ github.token }}`.
 
 The secret will be [masked to prevent accidental exposure in logs](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-log).
 

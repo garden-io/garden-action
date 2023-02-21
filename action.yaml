@@ -36,7 +36,7 @@ inputs:
       
       Only necessary if there are multiple garden projects in a repository, or when the project.garden.yml is in a subdirectory.
   github-token:
-    description: 'Github token for releases API. Required. Defaults to ${{ github.token }}.'
+    description: 'Github token for releases API. Required. Defaults to the `github.token` context variable.'
     required: true
     default: ${{ github.token }}
 runs:
