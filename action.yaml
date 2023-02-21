@@ -1,4 +1,4 @@
-name: 'Garden'
+name: 'Garden Action'
 description: 'GitHub actions for Garden'
 inputs:
   command:
