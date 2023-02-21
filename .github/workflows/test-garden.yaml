@@ -47,7 +47,7 @@ jobs:
       - name: Test 5 – Prepare kubeconfig and garden-auth-token
         uses: ./
         with:
-          kubeconfig: Zm9vYmFyCg==
+          kubeconfig: Zm9vYmFy
           garden-auth-token: foobar
 
       - name: Test 6 – Test if kubeconfig and garden-auth-token is prepared
