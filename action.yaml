@@ -78,7 +78,7 @@ runs:
             exit 1
           fi
           tar xzf *-linux-amd64.tar.gz
-          rm *-linux-amd64.tar.gz
+          rm *-linux-amd64.tar.gz *.sha256
 
           mkdir -p "$garden_version"
           mv linux-amd64/* "$garden_version"
