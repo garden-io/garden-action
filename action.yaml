@@ -1,0 +1,96 @@
+name: 'Garden'
+description: 'GitHub actions for Garden'
+inputs:
+  command:
+    description: 'All command line options for the garden cli command. Will only install garden if command is empty.'
+    required: false
+  logger-type:
+    description: 'Garden logger type.'
+    required: false
+    default: basic
+  log-level:
+    description: 'Garden log level.'
+    required: false
+    default: verbose
+  kubeconfig:
+    description: 'The kubeconfig to use with Garden'
+    required: false
+  kubeconfig-location:
+    description: 'Path where Garden expects the kubeconfig. Defaults to $HOME/kube/config'
+    required: false
+    default: ~/.kube/config
+  garden-version:
+    description: 'Garden version. Default: latest stable'
+    required: false
+    default: 'latest'
+  garden-auth-token:
+    description: 'An auth token to authenticate to Garden Cloud'
+    required: false
+  garden-workdir:
+    description: 'A path to a garden project in a repository. Only necessary if there are multiple garden projects in a repository.'
+  github-token:
+    description: 'Github token for releases API'
+    required: true
+    default: ${{ github.token }}
+runs:
+  using: "composite"
+  steps:
+    - name: prepare kubeconfig
+      shell: bash
+      env:
+        kubeconfig_base64: ${{ inputs.kubeconfig }}
+        kubeconfig_location: ${{ inputs.kubeconfig-location }}
+      run: |
+        # Prepare Kubeconfig
+        if [[ ! -d "$(dirname "${kubeconfig_location}")" ]]; then
+          mkdir -p "$(dirname "${kubeconfig_location}")"
+        fi
+
+        # Write kubeconfig
+        if [[ -n "${kubeconfig_base64}" ]]; then
+          echo "${kubeconfig_base64}" | base64 -d  > "${kubeconfig_location}"
+          chmod 700 "${kubeconfig_location}"
+        fi
+    - name: download garden
+      shell: bash
+      env:
+        garden_version: ${{ inputs.garden-version }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        # Install Garden
+        mkdir -p "$HOME/.garden"
+        cd "$HOME/.garden"
+
+        if ! [ -d "$garden_version" ]; then
+          echo "Downloading ${garden_version}..."
+
+          if [[ "$garden_version" = "latest" ]]; then
+            tag_param=""
+          else
+            tag_param="$garden_version"
+          fi
+
+          gh release download "$tag_param" --pattern '*-linux-amd64.tar.gz' -R garden-io/garden
+          tar xzf *-linux-amd64.tar.gz
+          rm *-linux-amd64.tar.gz
+
+          mkdir -p "$garden_version"
+          mv linux-amd64/* "$garden_version"
+        fi
+
+        # Create new symlink, or overwrite existing
+        ln -sfn "$garden_version" bin
+
+        echo "Using garden version $(bin/garden --version)"
+        echo "${HOME}/.garden/bin" >> $GITHUB_PATH
+    - name: run garden
+      if: inputs.command
+      shell: bash
+      env:
+        command: ${{ inputs.command }}
+        KUBECONFIG: ${{ inputs.kubeconfig-location }}
+        GARDEN_AUTH_TOKEN: ${{ inputs.garden-auth-token }}
+        GARDEN_LOGGER_TYPE: ${{ inputs.logger-type }}
+        GARDEN_LOG_LEVEL: ${{ inputs.log-level }}
+      working-directory: ${{ inputs.garden-workdir }}
+      run: garden ${command}
