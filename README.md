@@ -81,15 +81,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AWS auth
-        uses: aws-actions/configure-aws-credentials@1.7.0
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
-      - uses: actions/checkout@3.0.2
+      - uses: actions/checkout@v3.0.2
       - name: Deploy preview env with Garden
-        uses: garden-io/garden-action@1.0
+        uses: garden-io/garden-action@v1.0
         with:
           command: deploy --env preview
           kubeconfig: ${{ secrets.KUBECONFIG }}
@@ -98,15 +98,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AWS auth
-        uses: aws-actions/configure-aws-credentials@1.7.0
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
-      - uses: actions/checkout@3.0.2
+      - uses: actions/checkout@v3.0.2
       - name: Run tests in ci environment with Garden
-        uses: garden-io/garden-action@1.0
+        uses: garden-io/garden-action@v1.0
         with:
           command: >
             test --env ci
