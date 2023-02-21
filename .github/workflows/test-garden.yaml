@@ -11,9 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@c8454efe5d0bdefd25384362fe217428ca277d57 # 2.2.0
+        uses: step-security/harden-runner@c8454efe5d0bdefd25384362fe217428ca277d57 # v2.2.0
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # 3.0.2
 
       # Simple test cases for the action code.
