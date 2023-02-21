@@ -71,6 +71,12 @@ runs:
           fi
 
           gh release download "$tag_param" --pattern '*-linux-amd64.tar.gz' -R garden-io/garden
+          gh release download "$tag_param" --pattern '*-linux-amd64.tar.gz.sha256' -R garden-io/garden
+          checksum=$(openssl dgst -sha256 "${filename}" | awk '{ print $2 }')
+          if [ "$checksum" != "$SHA" ]; then
+            echo "Checksum validation failed." >&2
+            exit 1
+          fi
           tar xzf *-linux-amd64.tar.gz
           rm *-linux-amd64.tar.gz
 
