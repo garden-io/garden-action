@@ -1,6 +1,14 @@
 # GitHub Actions for Garden
 
-This action can be used to run Garden against a given environment.
+This action installs garden and can optionally be used to run any Garden command, for example `deploy`, `test` or `run workflow`.
+
+It will:
+1. Download Garden from the GitHub release artifacts for the given version (default latest) at [garden-io/garden](https://github.com/garden-io/garden)
+2. Verify the SHA256 checksum
+3. Export garden to the `PATH`, so it can be used from any scripts in the following steps of the GitHub Action job.
+4. If the `command` option is provided, it will run the given garden command.
+
+   If the `command` option is *not* provided it will only prepare garden, which means it will also export the `KUBECONFIG` and `GARDEN_AUTH_TOKEN` environment variables if the `kubeconfig` and `garden-auth-token` are configured. This is helpful when calling `garden` in scripts from one of the following steps.
 
 **Note:** At the moment this action only works with Linux-based GitHub Action runners.
 If you are using macOS or Windows runners and need this action, please open a GitHub issue – in case there is demand, we will rewrite this action to make it platform-independent. (We also accept Pull requests for rewriting this Action in Typescript)
