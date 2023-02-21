@@ -1,5 +1,8 @@
 name: 'Garden Action'
 description: 'GitHub actions for Garden'
+branding:
+  color: green
+  icon: check-circle
 inputs:
   command:
     description: |

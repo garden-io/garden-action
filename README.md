@@ -1,6 +1,17 @@
-# GitHub Actions for Garden
+# Garden Github Action
 
-This action can be used to run Garden against a given environment.
+This action installs garden and can optionally be used to run any [Garden](https://garden.io) command, for example `deploy`, `test` or `run workflow`.
+
+Garden combines rapid development, testing, and DevOps automation in one tool. 
+
+This action will perform the following steps:
+
+1. Download Garden from the GitHub release artifacts for the given version (default latest) at [garden-io/garden](https://github.com/garden-io/garden)
+2. Verify the SHA256 checksum
+3. Export garden to the `PATH`, so it can be used from any scripts in the following steps of the GitHub Action job.
+4. If the `command` option is provided, it will run the given garden command.
+
+   If the `command` option is *not* provided it will only prepare garden, which means it will also export the `KUBECONFIG` and `GARDEN_AUTH_TOKEN` environment variables if the `kubeconfig` and `garden-auth-token` are configured. This is helpful when calling `garden` in scripts from one of the following steps.
 
 **Note:** At the moment this action only works with Linux-based GitHub Action runners.
 If you are using macOS or Windows runners and need this action, please open a GitHub issue – in case there is demand, we will rewrite this action to make it platform-independent. (We also accept Pull requests for rewriting this Action in Typescript)
@@ -81,15 +92,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AWS auth
-        uses: aws-actions/configure-aws-credentials@1.7.0
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
-      - uses: actions/checkout@3.0.2
+      - uses: actions/checkout@v3.0.2
       - name: Deploy preview env with Garden
-        uses: garden-io/garden-action@1.0
+        uses: garden-io/garden-action@v1.0
         with:
           command: deploy --env preview
           kubeconfig: ${{ secrets.KUBECONFIG }}
@@ -98,15 +109,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AWS auth
-        uses: aws-actions/configure-aws-credentials@1.7.0
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
-      - uses: actions/checkout@3.0.2
+      - uses: actions/checkout@v3.0.2
       - name: Run tests in ci environment with Garden
-        uses: garden-io/garden-action@1.0
+        uses: garden-io/garden-action@v1.0
         with:
           command: >
             test --env ci
