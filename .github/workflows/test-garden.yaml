@@ -52,7 +52,7 @@ jobs:
 
       - name: Test 6 – Test if kubeconfig and garden-auth-token is prepared
         run: |
-          if [[ "cat $KUBECONFIG" != "foobar" ]]; then
+          if [[ "$(cat $KUBECONFIG)" != "foobar" ]]; then
             echo "The $KUBECONFIG file did not contain the expected string foobar"
             exit 1
           fi
