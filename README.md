@@ -6,7 +6,11 @@ This action can be used to run Garden against a given environment.
 
 ## `command`
 
-**Optional** The Garden command to execute, including all options. For example `deploy`, `test`, `run workflow` etc. For full documentation see [documentation](https://docs.garden.io/reference/commands).
+**Optional** The Garden command to execute, including all options. For example `deploy`, `test`, `run workflow` etc.
+
+If not provided, the garden-action will only install garden and export the `KUBECONFIG` and `GARDEN_AUTH_TOKEN` environment variables for use in scripts in later steps.
+
+For the full documentation please refer to the [Garden CLI documentation](https://docs.garden.io/reference/commands).
 
 ## `kubeconfig`
 
@@ -19,6 +23,10 @@ cat kubeconfig.yaml | base64
 ```
 
 Encoding is necessary to deal with newlines and special characters. This action will decode the kubeconfig for usage in the action.
+
+The secret will be [masked to prevent accidental exposure in logs](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-log)
+
+**If no command has been supplied, the action will expose this value to the the following steps in the GitHub Action job by exporting a `KUBECONFIG` environment variable.**
 
 ## `kubeconfig-location`
 
@@ -33,17 +41,26 @@ Defaults to `/github/home/.kube/config`
 
 **Optional** A token to authenticate to Garden Cloud.
 
+The secret will be [masked to prevent accidental exposure in logs](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-log).
+
+**If no command has been supplied, the action will expose this value to the the following steps in the GitHub Action job by exporting a `GARDEN_AUTH_TOKEN` environment variable.**
+
 ## `garden-workdir`
 
-**Optional** A path to a garden project in a repository. Only necessary if there are multiple garden projects in a repository
+**Optional** A path to a garden project in a repository.
+
+Only necessary if there are multiple garden projects in a repository or if the `project.garden.yml` is in a subdirectory.
 
 ## `github-token`
 
-**Optional** This token will be used to authenticate to GitHub API for fetching the latest Garden release. Default is ${{ github.token }}
+**Optional** This token will be used to authenticate to GitHub API for fetching the latest Garden release. The default is ${{ github.token }}.
+
+The secret will be [masked to prevent accidental exposure in logs](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-log).
 
 
 ## Outputs
 
+The garden-action does not export any outputs.
 
 ## Example usage
 
@@ -61,15 +78,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AWS auth
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # 1.7.0
+        uses: aws-actions/configure-aws-credentials@1.7.0
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # 3.0.2
+      - uses: actions/checkout@3.0.2
       - name: Deploy preview env with Garden
-        uses: ./.github/actions/garden
+        uses: garden-io/garden-action@1.0
         with:
           command: deploy --env preview
           kubeconfig: ${{ secrets.KUBECONFIG }}
@@ -78,16 +95,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: AWS auth
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # 1.7.0
+        uses: aws-actions/configure-aws-credentials@1.7.0
         with:
           aws-region: eu-central-1
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # 3.0.2
+      - uses: actions/checkout@3.0.2
       - name: Run tests in ci environment with Garden
-        uses: ./.github/actions/garden
-        id: garden
+        uses: garden-io/garden-action@1.0
         with:
           command: >
             test --env ci

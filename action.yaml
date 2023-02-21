@@ -2,45 +2,61 @@ name: 'Garden'
 description: 'GitHub actions for Garden'
 inputs:
   command:
-    description: 'All command line options for the garden cli command. Will only install garden if command is empty.'
+    description: |
+      All command line options for the garden cli command.
+
+      If not provided, the garden-action will only install garden and export the KUBECONFIG and GARDEN_AUTH_TOKEN
+      environment variables for use in scripts in later steps.
     required: false
   logger-type:
-    description: 'Garden logger type.'
+    description: 'Garden logger type. Defaults to basic.'
     required: false
     default: basic
   log-level:
-    description: 'Garden log level.'
+    description: 'Garden log level. Defaults to verbose.'
     required: false
     default: verbose
   kubeconfig:
-    description: 'The kubeconfig to use with Garden'
+    description: 'A base64 encoded string of the kubeconfig to use with Garden. Optional.'
     required: false
   kubeconfig-location:
-    description: 'Path where Garden expects the kubeconfig. Defaults to $HOME/kube/config'
+    description: 'Path where Garden expects the kubeconfig. Defaults to $HOME/kube/config.'
     required: false
     default: ~/.kube/config
   garden-version:
-    description: 'Garden version. Default: latest stable'
+    description: 'Garden version. Defaults to latest stable.'
     required: false
     default: 'latest'
   garden-auth-token:
-    description: 'An auth token to authenticate to Garden Cloud'
+    description: 'An auth token to authenticate in case your project is connected to Garden Cloud. Optional.'
     required: false
   garden-workdir:
-    description: 'A path to a garden project in a repository. Only necessary if there are multiple garden projects in a repository.'
+    description: |
+      A path to a garden project in a repository.
+      
+      Only necessary if there are multiple garden projects in a repository, or when the project.garden.yml is in a subdirectory.
   github-token:
-    description: 'Github token for releases API'
+    description: 'Github token for releases API. Required. Defaults to ${{ github.token }}.'
     required: true
     default: ${{ github.token }}
 runs:
   using: "composite"
   steps:
-    - name: prepare kubeconfig
+    - name: prepare
       shell: bash
       env:
         kubeconfig_base64: ${{ inputs.kubeconfig }}
         kubeconfig_location: ${{ inputs.kubeconfig-location }}
+        garden_auth_token: ${{ inputs.garden-auth-token }}
+        github_token: ${{ inputs.github-token }}
       run: |
+        # Prepare
+
+        # Mask secrets
+        echo "::add-mask::${kubeconfig_base64}"
+        echo "::add-mask::${garden_auth_token}"
+        echo "::add-mask::${github_token}"
+
         # Prepare Kubeconfig
         if [[ ! -d "$(dirname "${kubeconfig_location}")" ]]; then
           mkdir -p "$(dirname "${kubeconfig_location}")"
@@ -100,3 +116,18 @@ runs:
         GARDEN_LOG_LEVEL: ${{ inputs.log-level }}
       working-directory: ${{ inputs.garden-workdir }}
       run: garden ${command}
+    - name: export variables
+      if: ${{ !inputs.command }}
+      shell: bash
+      env:
+        kubeconfig_base64: ${{ inputs.kubeconfig }}
+        kubeconfig_location: ${{ inputs.kubeconfig-location }}
+        garden_auth_token: ${{ inputs.garden-auth-token }}
+      run: |
+        # Export environment variables
+        if [[ "${kubeconfig_base64}" != "" ]]; then
+          echo "KUBECONFIG=${kubeconfig_location}" >> $GITHUB_ENV
+        fi
+        if [[ "${garden_auth_token}" != "" ]]; then
+          echo "GARDEN_AUTH_TOKEN=${garden_auth_token} >> $GITHUB_ENV"
+        fi
