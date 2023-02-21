@@ -53,9 +53,9 @@ runs:
         # Prepare
 
         # Mask secrets
-        echo "::add-mask::${kubeconfig_base64}"
-        echo "::add-mask::${garden_auth_token}"
-        echo "::add-mask::${github_token}"
+        [[ "${kubeconfig_base64}" != "" ]] && echo "::add-mask::${kubeconfig_base64}"
+        [[ "${garden_auth_token}" != "" ]] && echo "::add-mask::${garden_auth_token}"
+        [[ "${github_token}" != "" ]] && echo "::add-mask::${github_token}"
 
         # Prepare Kubeconfig
         if [[ ! -d "$(dirname "${kubeconfig_location}")" ]]; then
