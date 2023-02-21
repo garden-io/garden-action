@@ -1,8 +1,11 @@
-# GitHub Actions for Garden
+# Garden Github Action
 
-This action installs garden and can optionally be used to run any Garden command, for example `deploy`, `test` or `run workflow`.
+This action installs garden and can optionally be used to run any [Garden](https://garden.io) command, for example `deploy`, `test` or `run workflow`.
 
-It will:
+Garden combines rapid development, testing, and DevOps automation in one tool. 
+
+This action will perform the following steps:
+
 1. Download Garden from the GitHub release artifacts for the given version (default latest) at [garden-io/garden](https://github.com/garden-io/garden)
 2. Verify the SHA256 checksum
 3. Export garden to the `PATH`, so it can be used from any scripts in the following steps of the GitHub Action job.
