@@ -44,7 +44,8 @@ The secret will be [masked to prevent accidental exposure in logs](https://docs.
 
 ## `kubeconfig-location`
 
-**Optional** Specify a location the GitHub action should be saved to in the container while running the action. This is only necessary if you have configured the `kubeconfig` parameter in your project.garden.yaml provider configuration. Please note that the home directory in the GitHub action context is `/github/home`.
+**Optional** Specify a location the GitHub action should be saved to in the container while running the action. This is only necessary if you have configured the `kubeconfig` parameter in your project.garden.yaml provider configuration.
+
 Defaults to `${{ runner.temp }}/garden/kubeconfig`
 
 ## `garden-version`
