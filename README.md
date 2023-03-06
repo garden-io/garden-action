@@ -45,7 +45,7 @@ The secret will be [masked to prevent accidental exposure in logs](https://docs.
 ## `kubeconfig-location`
 
 **Optional** Specify a location the GitHub action should be saved to in the container while running the action. This is only necessary if you have configured the `kubeconfig` parameter in your project.garden.yaml provider configuration. Please note that the home directory in the GitHub action context is `/github/home`.
-Defaults to `/github/home/.kube/config`
+Defaults to `${{ runner.temp }}/garden/kubeconfig`
 
 ## `garden-version`
 
@@ -100,7 +100,7 @@ jobs:
           role-duration-seconds: 3600
       - uses: actions/checkout@v3.0.2
       - name: Deploy preview env with Garden
-        uses: garden-io/garden-action@v1.0
+        uses: garden-io/garden-action@v1.1
         with:
           command: deploy --env preview
           kubeconfig: ${{ secrets.KUBECONFIG }}
@@ -117,7 +117,7 @@ jobs:
           role-duration-seconds: 3600
       - uses: actions/checkout@v3.0.2
       - name: Run tests in ci environment with Garden
-        uses: garden-io/garden-action@v1.0
+        uses: garden-io/garden-action@v1.1
         with:
           command: >
             test --env ci
