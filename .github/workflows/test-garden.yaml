@@ -25,10 +25,10 @@ jobs:
       # Simple test cases for the action code.
       # This is basically a smoke test; Semantic behaviour to be checked manually
 
-      - name: Test 1 - Version should be edge
+      - name: Test 1 - Version should be edge-bonsai
         uses: ./
         with:
-          garden-version: edge
+          garden-version: edge-bonsai
           command: --version
 
       - name: Test 2 - Version should be latest
