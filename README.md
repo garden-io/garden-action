@@ -101,7 +101,7 @@ jobs:
           role-duration-seconds: 3600
       - uses: actions/checkout@v3.0.2
       - name: Deploy preview env with Garden
-        uses: garden-io/garden-action@v1.1
+        uses: garden-io/garden-action@v1.2
         with:
           command: deploy --env preview
           kubeconfig: ${{ secrets.KUBECONFIG }}
@@ -118,7 +118,7 @@ jobs:
           role-duration-seconds: 3600
       - uses: actions/checkout@v3.0.2
       - name: Run tests in ci environment with Garden
-        uses: garden-io/garden-action@v1.1
+        uses: garden-io/garden-action@v1.2
         with:
           command: >
             test --env ci
