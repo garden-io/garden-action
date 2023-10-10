@@ -108,7 +108,7 @@ runs:
         # Create new symlink, or overwrite existing
         ln -sfn "$garden_version" bin
 
-        echo "Using garden version $(bin/garden --version)"
+        echo "Using $(bin/garden version)"
         echo "$GARDEN_DIR/bin" >> "$GITHUB_PATH"
     - name: run garden
       if: inputs.command

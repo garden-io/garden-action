@@ -29,12 +29,12 @@ jobs:
         uses: ./
         with:
           garden-version: edge-bonsai
-          command: --version
+          command: version
 
       - name: Test 2 - Version should be latest
         uses: ./
         with:
-          command: --version
+          command: version
 
       - name: Test 3 – Only prepare garden version
         uses: ./
@@ -42,7 +42,7 @@ jobs:
           garden-version: 0.12.44
 
       - name: Test 4 - Version should be 0.12.44
-        run: garden --version
+        run: garden version
 
       - name: Test 5 – Prepare kubeconfig and garden-auth-token
         uses: ./
