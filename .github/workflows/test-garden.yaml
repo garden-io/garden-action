@@ -44,18 +44,13 @@ jobs:
       - name: Test 4 - Version should be 0.12.44
         run: garden --version
 
-      - name: Test 5 – Prepare kubeconfig and garden-auth-token
+      - name: Test 5 – Prepare garden-auth-token
         uses: ./
         with:
-          kubeconfig: Zm9vYmFy
           garden-auth-token: foobar
 
-      - name: Test 6 – Test if kubeconfig and garden-auth-token is prepared
+      - name: Test 6 – Test if garden-auth-token is prepared
         run: |
-          if [[ "$(cat $KUBECONFIG)" != "foobar" ]]; then
-            echo "The $KUBECONFIG file did not contain the expected string foobar"
-            exit 1
-          fi
           if [[ "$GARDEN_AUTH_TOKEN" != "foobar" ]]; then
             echo "The $GARDEN_AUTH_TOKEN variable was not set to the expected string foobar"
             exit 1

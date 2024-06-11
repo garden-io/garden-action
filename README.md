@@ -2,7 +2,7 @@
 
 This action installs garden and can optionally be used to run any [Garden](https://garden.io) command, for example `deploy`, `test` or `run workflow`.
 
-Garden combines rapid development, testing, and DevOps automation in one tool. 
+Garden combines rapid development, testing, and DevOps automation in one tool.
 
 This action will perform the following steps:
 
@@ -11,7 +11,9 @@ This action will perform the following steps:
 3. Export garden to the `PATH`, so it can be used from any scripts in the following steps of the GitHub Action job.
 4. If the `command` option is provided, it will run the given garden command.
 
-   If the `command` option is *not* provided it will only prepare garden, which means it will also export the `KUBECONFIG` and `GARDEN_AUTH_TOKEN` environment variables if the `kubeconfig` and `garden-auth-token` are configured. This is helpful when calling `garden` in scripts from one of the following steps.
+   If the `command` option is *not* provided it will only prepare garden, which means it will install Garden and export it to the `PATH` environment variable. It will also export the `GARDEN_AUTH_TOKEN` environment variable `garden-auth-token` is configured.
+
+   This is helpful when calling `garden` in scripts from one of the following steps.
 
 **Note:** At the moment this action only works with Linux-based GitHub Action runners.
 If you are using macOS or Windows runners and need this action, please open a GitHub issue – in case there is demand, we will rewrite this action to make it platform-independent. (We also accept Pull requests for rewriting this Action in Typescript)
@@ -22,30 +24,11 @@ If you are using macOS or Windows runners and need this action, please open a Gi
 
 **Optional** The Garden command to execute, including all options. For example `deploy`, `test`, `run workflow` etc.
 
-If not provided, the garden-action will only install garden and export the `KUBECONFIG` and `GARDEN_AUTH_TOKEN` environment variables for use in scripts in later steps.
+If not provided, the garden-action will
+- install garden and export it to the `PATH` environment variable for subsequent steps
+- export the `GARDEN_AUTH_TOKEN` environment variable for subsequent steps if the `garden-auth-token` input has been provided
 
 For the full documentation please refer to the [Garden CLI documentation](https://docs.garden.io/reference/commands).
-
-## `kubeconfig`
-
-**Optional** Authentication to a Kubernetes Cluster can be done in multiple ways. This option allows to specify a base64 encoded kubeconfig, as a secret for GitHub actions. To use this option, base64 encode the relevant kubeconfig with the context referenced in your Garden project:
-
-```
-
-cat kubeconfig.yaml | base64
-
-```
-
-Encoding is necessary to deal with newlines and special characters. This action will decode the kubeconfig for usage in the action.
-
-The secret will be [masked to prevent accidental exposure in logs](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#masking-a-value-in-log)
-
-**If no command has been supplied, the action will expose this value to the the following steps in the GitHub Action job by exporting a `KUBECONFIG` environment variable.**
-
-## `kubeconfig-location`
-
-**Optional** Specify a location the GitHub action should be saved to in the container while running the action. This is only necessary if you have configured the `kubeconfig` parameter in your project.garden.yaml provider configuration. Please note that the home directory in the GitHub action context is `/github/home`.
-Defaults to `${{ runner.temp }}/garden/kubeconfig`
 
 ## `garden-version`
 
@@ -98,12 +81,18 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
+      - name: AWS EKS Kubeconfig
+        run: |
+          # Add EKS cluster ${cluster_name} to ~/.kube/config
+          # NOTE: The context name will be the EKS cluster ARN by default.
+          # If your Garden configuration expects a different context name,
+          # you can add override it using the `--alias` option.
+          aws eks update-kubeconfig --name ${cluster_name} --region ${region}
       - uses: actions/checkout@v3.0.2
       - name: Deploy preview env with Garden
         uses: garden-io/garden-action@v1.1
         with:
           command: deploy --env preview
-          kubeconfig: ${{ secrets.KUBECONFIG }}
           garden-auth-token: ${{ secrets.GARDEN_AUTH_TOKEN }}
   garden-ci:
     runs-on: ubuntu-latest
@@ -115,6 +104,13 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_EKS_DEV }}
           role-session-name: GitHubActionsDev
           role-duration-seconds: 3600
+      - name: AWS EKS Kubeconfig
+        run: |
+          # Add EKS cluster ${cluster_name} to ~/.kube/config
+          # NOTE: The context name will be the EKS cluster ARN by default.
+          # If your Garden configuration expects a different context name,
+          # you can add override it using the `--alias` option.
+          aws eks update-kubeconfig --name ${cluster_name} --region ${region}
       - uses: actions/checkout@v3.0.2
       - name: Run tests in ci environment with Garden
         uses: garden-io/garden-action@v1.1
@@ -123,6 +119,5 @@ jobs:
             test --env ci
             --var postgres-database=postgres
             --var postgres-password=${{ secrets.PG_PASSWORD }}
-          kubeconfig: ${{ secrets.KUBECONFIG }}
           garden-auth-token: ${{ secrets.GARDEN_AUTH_TOKEN }}
 ```
