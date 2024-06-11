@@ -90,7 +90,7 @@ jobs:
           aws eks update-kubeconfig --name ${cluster_name} --region ${region}
       - uses: actions/checkout@v3.0.2
       - name: Deploy preview env with Garden
-        uses: garden-io/garden-action@v1.1
+        uses: garden-io/garden-action@v1.2
         with:
           command: deploy --env preview
           garden-auth-token: ${{ secrets.GARDEN_AUTH_TOKEN }}
@@ -113,7 +113,7 @@ jobs:
           aws eks update-kubeconfig --name ${cluster_name} --region ${region}
       - uses: actions/checkout@v3.0.2
       - name: Run tests in ci environment with Garden
-        uses: garden-io/garden-action@v1.1
+        uses: garden-io/garden-action@v1.2
         with:
           command: >
             test --env ci

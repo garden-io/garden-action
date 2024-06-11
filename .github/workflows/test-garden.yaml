@@ -25,16 +25,16 @@ jobs:
       # Simple test cases for the action code.
       # This is basically a smoke test; Semantic behaviour to be checked manually
 
-      - name: Test 1 - Version should be edge
+      - name: Test 1 - Version should be edge-bonsai
         uses: ./
         with:
-          garden-version: edge
-          command: --version
+          garden-version: edge-bonsai
+          command: version
 
       - name: Test 2 - Version should be latest
         uses: ./
         with:
-          command: --version
+          command: version
 
       - name: Test 3 – Only prepare garden version
         uses: ./
@@ -42,7 +42,7 @@ jobs:
           garden-version: 0.12.44
 
       - name: Test 4 - Version should be 0.12.44
-        run: garden --version
+        run: garden version
 
       - name: Test 5 – Prepare garden-auth-token
         uses: ./
